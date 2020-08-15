@@ -81,7 +81,21 @@ DEVICEABLE static inline bool TreeAtPosMatchesHeight(int innerX, int innerZ, int
 			((innerX == TREE2_X && innerZ == TREE2_Z && height == TREE2_HEIGHT));
 }
 
+DEVICEABLE static inline bool TreeAtPosMatchesLeaves(int innerX, int innerZ, lcg::Random& rand)
+{
+	bool _0 = lcg::next_int<2>(rand) != 0;
+	lcg::advance<3>(rand);
+	bool _4 = lcg::next_int<2>(rand) != 0;
+	lcg::advance<7>(rand);
+	bool _12 = lcg::next_int<2>(rand) != 0;
+	lcg::advance<3>(rand);
+	//TREE_1: _0 && _4 && !_12 (A2)
+	//TREE_2: !_0 && _4 (A1)
+	bool tree1Match = innerX == TREE1_X && innerZ == TREE1_Z && _0 && _4 && !_12;
+	bool tree2Match = innerX == TREE2_X && innerZ == TREE2_Z && !_0 && _4;
 
+	return tree1Match || tree2Match;
+}
 
 
 
@@ -143,10 +157,12 @@ DEVICEABLE static inline bool CheckChunkSeed(lcg::Random rand) {
 		if (!TreeAtPosMatchesHeight(x, z, treeHeight))
 			//continue;
 			return false;
+		if (!TreeAtPosMatchesLeaves(x, z, rand))
+			//continue;
+			return false;
 		treeMask |= thisMask;
 		// successful tree attempt
 		treeCount++;
-		lcg::advance<16>(rand); // not sure on this number // pretty sure it is
 	  } else {
 		// failed tree attempt
 	  }
